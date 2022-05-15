@@ -11,5 +11,6 @@ func main() {
 	utils.CheckIfError(err)
 	err = analyses.SyntacticAnalysis(file)
 	utils.CheckIfError(err)
-
+	err = analyses.SemanticAnalysis(file)
+	utils.CheckIfError(err)
 }
