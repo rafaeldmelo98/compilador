@@ -7,8 +7,9 @@ import (
 )
 
 func main() {
+	var table analyses.Table
 	file := utils.ReadFile("file.txt")
-	analyses.LexicalAnalysis(file)
+	analyses.LexicalAnalysis(file, &table)
 	analyses.SyntacticAnalysis(file)
 	analyses.SemanticAnalysis(file)
 	fmt.Println("PASSED!")
