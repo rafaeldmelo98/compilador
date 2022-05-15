@@ -1,10 +1,16 @@
 package analyses
 
 import (
-	"compilador-trabalho1/utils"
 	"fmt"
+	"log"
 	"strings"
 )
+
+type Table struct {
+	Index []int
+	Token []string
+	Type  []string
+}
 
 const KNOWEDALPHABET = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%&+-*/;= `
 
@@ -15,16 +21,33 @@ var RESERVEDWORDS = [...]string{"asm", "auto", "break", "case", "catch", "char",
 	"template", "this", "throw", "try", "typedef", "union", "unsigned", "virtual", "void",
 	"volatile", "while"}
 
-func LexicalAnalysis(file string) error {
+const SYMBOLS = `%&.-*/;=`
+
+func LexicalAnalysis(file string) {
 	checkAlphabet(file)
-	return nil
+	checkReservedWord(file)
 }
 
 func checkAlphabet(file string) {
 	for _, char := range file {
 		exist := strings.Contains(KNOWEDALPHABET, string(char))
 		if !exist {
-			utils.CheckIfError(fmt.Errorf("Lexical Error: Invalid Character."))
+			log.Fatal("Lexical Error: Invalid Character.")
 		}
 	}
+}
+
+func checkReservedWord(file string) {
+	var word string
+	for _, char := range file {
+		word = word + string(char)
+		fmt.Println(word)
+		if word == "int" {
+			log.Fatal("It's integer")
+		}
+	}
+}
+
+func isSymbol() {
+
 }

@@ -8,11 +8,8 @@ import (
 
 func main() {
 	file := utils.ReadFile("file.txt")
-	err := analyses.LexicalAnalysis(file)
-	utils.CheckIfError(err)
-	err = analyses.SyntacticAnalysis(file)
-	utils.CheckIfError(err)
-	err = analyses.SemanticAnalysis(file)
-	utils.CheckIfError(err)
+	analyses.LexicalAnalysis(file)
+	analyses.SyntacticAnalysis(file)
+	analyses.SemanticAnalysis(file)
 	fmt.Println("PASSED!")
 }
