@@ -58,7 +58,7 @@ func labelTokens(file string, table *Table) {
 		}
 		if !isNumeric(string(char)) && isNumeric(word) && word != "" {
 			setTokenInTable(table, word, "numeric")
-			checkNextCharacter(string(char), table)
+			checkNextCharacterIfSymbolOrSemicolon(string(char), table)
 			word = ""
 			continue
 		}
@@ -87,7 +87,7 @@ func labelTokens(file string, table *Table) {
 	}
 }
 
-func checkNextCharacter(token string, table *Table) {
+func checkNextCharacterIfSymbolOrSemicolon(token string, table *Table) {
 	if isSymbol(string(token)) {
 		setTokenInTable(table, string(token), "symbol")
 	} else if isSemicolon(string(token)) {
