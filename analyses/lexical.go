@@ -13,7 +13,7 @@ type Table struct {
 	Type  []string
 }
 
-const KNOWEDALPHABET = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%&+-*/;:,=(){}><!"' `
+const KNOWEDALPHABET = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%&+-*/;:.,=(){}><!"' `
 
 var RESERVEDWORDS = [...]string{"asm", "auto", "break", "case", "catch", "char", "class", "const",
 	"continue", "default", "delete", "do", "double", "else", "enum", "extern", "float", "for",
@@ -22,7 +22,7 @@ var RESERVEDWORDS = [...]string{"asm", "auto", "break", "case", "catch", "char",
 	"template", "this", "throw", "try", "typedef", "union", "unsigned", "virtual", "void",
 	"volatile", "while", "print", "scan"}
 
-const SYMBOLS = `%&.+-*/:=(){}><!`
+const SYMBOLS = `%&+-*/:=(){}><!`
 
 func LexicalAnalysis(file string, table *Table) {
 	file = cleanFile(file)
@@ -56,7 +56,7 @@ func labelTokens(file string, table *Table) {
 			word = ""
 			continue
 		}
-		if !isNumeric(string(char)) && isNumeric(word) && word != "" {
+		if !isNumeric(string(char)) && isNumeric(word) && word != "" && string(char) != "." {
 			setTokenInTable(table, word, "numeric")
 			checkNextCharacterIfSymbolOrSemicolon(string(char), table)
 			word = ""

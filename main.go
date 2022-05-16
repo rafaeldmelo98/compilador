@@ -10,7 +10,7 @@ func main() {
 	var table analyses.Table
 	file := utils.ReadFile("file.txt")
 	analyses.LexicalAnalysis(file, &table)
-	analyses.SyntacticAnalysis(file)
+	analyses.SyntacticAnalysis(&table)
 	analyses.SemanticAnalysis(file)
 	fmt.Println("PASSED!")
 }
