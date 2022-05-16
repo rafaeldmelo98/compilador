@@ -3,6 +3,7 @@ package analyses
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -12,28 +13,34 @@ type Table struct {
 	Type  []string
 }
 
-const KNOWEDALPHABET = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%&+-*/;= `
+const KNOWEDALPHABET = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%&+-*/;:,=(){}><!"' `
 
 var RESERVEDWORDS = [...]string{"asm", "auto", "break", "case", "catch", "char", "class", "const",
 	"continue", "default", "delete", "do", "double", "else", "enum", "extern", "float", "for",
 	"friend", "goto", "if", "inline", "int", "long", "new", "operator", "private", "protected",
 	"public", "register", "return", "short", "signed", "sizeof", "static", "struct", "switch",
 	"template", "this", "throw", "try", "typedef", "union", "unsigned", "virtual", "void",
-	"volatile", "while"}
+	"volatile", "while", "print", "scan"}
 
-const SYMBOLS = `%&.+-*/=`
+const SYMBOLS = `%&.+-*/:=(){}><!`
 
 func LexicalAnalysis(file string, table *Table) {
+	file = cleanFile(file)
 	checkAlphabet(file)
 	labelTokens(file, table)
 	printTable(table)
 }
 
+func cleanFile(file string) string {
+	file = strings.ReplaceAll(file, "\n", "")
+	file = strings.ReplaceAll(file, "\t", "")
+	file = strings.ReplaceAll(file, " ", "")
+	return file
+}
+
 func checkAlphabet(file string) {
-	file = strings.TrimSuffix(file, "\n")
 	fmt.Println(file)
 	for _, char := range file {
-
 		exist := strings.Contains(KNOWEDALPHABET, string(char))
 		if !exist {
 			log.Fatal("Lexical Error: Invalid Character.")
@@ -44,34 +51,47 @@ func checkAlphabet(file string) {
 func labelTokens(file string, table *Table) {
 	var word string
 	for _, char := range file {
+		if isString(word) {
+			setTokenInTable(table, word, "string")
+			word = ""
+			continue
+		}
+		if !isNumeric(string(char)) && isNumeric(word) && word != "" {
+			setTokenInTable(table, word, "numeric")
+			checkNextCharacter(string(char), table)
+			word = ""
+			continue
+		}
 		if isSymbol(string(char)) && word == "" {
-			table.Index = append(table.Index, len(table.Index)+1)
-			table.Token = append(table.Token, string(char))
-			table.Type = append(table.Type, "symbol")
+			setTokenInTable(table, string(char), "symbol")
+			word = ""
+			continue
 		}
 		if isSymbol(string(char)) && word != "" {
-
+			setTokenInTable(table, word, "variable")
+			setTokenInTable(table, string(char), "symbol")
+			word = ""
+			continue
 		}
-		if isSemicolon(string(char)) {
-			table.Index = append(table.Index, len(table.Index)+1)
-			table.Token = append(table.Token, string(char))
-			table.Type = append(table.Type, "symbol-semicolon")
-		}
-		if string(char) == ";" && word != "" {
-			defineVariable(word, table)
+		if isSemicolon(string(char)) && word == "" {
+			setTokenInTable(table, string(char), "symbol-semicolon")
+			word = ""
 			continue
 		}
 		word = word + string(char)
-		fmt.Println(word)
 		if isReservedWord(word, table) {
-			table.Index = append(table.Index, len(table.Index)+1)
-			table.Token = append(table.Token, word)
-			table.Type = append(table.Type, "reserved word")
+			setTokenInTable(table, word, "reserved word")
+			word = ""
 			continue
 		}
-		if isEmptySpace(word) {
-			word = ""
-		}
+	}
+}
+
+func checkNextCharacter(token string, table *Table) {
+	if isSymbol(string(token)) {
+		setTokenInTable(table, string(token), "symbol")
+	} else if isSemicolon(string(token)) {
+		setTokenInTable(table, string(token), "symbol-semicolon")
 	}
 }
 
@@ -90,10 +110,6 @@ func isSemicolon(token string) bool {
 	return false
 }
 
-func isEmptySpace(token string) bool {
-	return token == " "
-}
-
 func isReservedWord(token string, table *Table) bool {
 	for _, word := range RESERVEDWORDS {
 		if token == word {
@@ -101,6 +117,25 @@ func isReservedWord(token string, table *Table) bool {
 		}
 	}
 	return false
+}
+
+func isNumeric(token string) bool {
+	_, err := strconv.ParseFloat(token, 64)
+	if err == nil {
+		return true
+	}
+	_, err = strconv.Atoi(token)
+	if err == nil {
+		return true
+	}
+	return false
+}
+
+func isString(token string) bool {
+	if len(token) < 2 {
+		return false
+	}
+	return string(token[0]) == "\"" && string(token[len(token)-1]) == "\""
 }
 
 func printTable(table *Table) {

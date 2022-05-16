@@ -1,1 +1,5 @@
-intx=10;int10=15;
+int x = 10;
+int y = 20;
+if(x+y>3){
+    print("ola");
+}
