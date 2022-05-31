@@ -20,9 +20,28 @@ var RESERVEDWORDS = [...]string{"asm", "auto", "break", "case", "catch", "char",
 	"friend", "goto", "if", "inline", "int", "long", "new", "operator", "private", "protected",
 	"public", "register", "return", "short", "signed", "sizeof", "static", "struct", "switch",
 	"template", "this", "throw", "try", "typedef", "union", "unsigned", "virtual", "void",
-	"volatile", "while", "print", "scan"}
+	"volatile", "while", "print", "scan", "string"}
 
-const SYMBOLS = `%&+-*/:=(){}><!`
+const SYMBOLS = `-+*/%&|><!(){}=;.,`
+
+const TOKEN_SUB = `-`
+const TOKEN_ADD = `+`
+const TOKEN_TIMES = `*`
+const TOKEN_DIV = `/`
+const TOKEN_MOD = `%`
+const TOKEN_AND = `&&`
+const TOKEN_OR = `||`
+const TOKEN_GREAT = `>`
+const TOKEN_MINOR = `<`
+const TOKEN_NOT = `!`
+const TOKEN_OPEN_PARENTESES = `(`
+const TOKEN_CLOSE_PARENTESES = `)`
+const TOKEN_OPEN_KEY = `{`
+const TOKEN_CLOSE_KEY = `}`
+const TOKEN_ASSIG = `=`
+const TOKEN_COMMA = `,`
+const TOKEN_COLON = `:`
+const TOKEN_SEMICOLON = `;`
 
 func LexicalAnalysis(file string, table *Table) {
 	file = cleanFile(file)
@@ -63,24 +82,24 @@ func labelTokens(file string, table *Table) {
 			continue
 		}
 		if isSymbol(string(char)) && word == "" {
-			setTokenInTable(table, string(char), "symbol")
+			defineSymbolType(table, string(char))
 			word = ""
 			continue
 		}
 		if isSymbol(string(char)) && word != "" {
-			setTokenInTable(table, word, "variable")
-			setTokenInTable(table, string(char), "symbol")
+			setTokenInTable(table, word, "id")
+			defineSymbolType(table, string(char))
 			word = ""
 			continue
 		}
-		if isSemicolon(string(char)) && word == "" {
+		if string(char) == TOKEN_SEMICOLON && word == "" {
 			setTokenInTable(table, string(char), "symbol-semicolon")
 			word = ""
 			continue
 		}
 		word = word + string(char)
 		if isReservedWord(word, table) {
-			setTokenInTable(table, word, "reserved word")
+			setTokenInTable(table, word, "reserved-word")
 			word = ""
 			continue
 		}
@@ -149,4 +168,42 @@ func setTokenInTable(table *Table, token string, typeToken string) {
 	table.Index = append(table.Index, len(table.Index)+1)
 	table.Token = append(table.Token, token)
 	table.Type = append(table.Type, typeToken)
+}
+
+func defineSymbolType(table *Table, token string) {
+	if TOKEN_SUB == token {
+		setTokenInTable(table, token, "sub")
+	} else if TOKEN_ADD == token {
+		setTokenInTable(table, token, "add")
+	} else if TOKEN_TIMES == token {
+		setTokenInTable(table, token, "times")
+	} else if TOKEN_DIV == token {
+		setTokenInTable(table, token, "division")
+	} else if TOKEN_MOD == token {
+		setTokenInTable(table, token, "module")
+	} else if TOKEN_AND == token {
+		setTokenInTable(table, token, "and")
+	} else if TOKEN_OR == token {
+		setTokenInTable(table, token, "or")
+	} else if TOKEN_GREAT == token {
+		setTokenInTable(table, token, "great")
+	} else if TOKEN_MINOR == token {
+		setTokenInTable(table, token, "minus")
+	} else if TOKEN_NOT == token {
+		setTokenInTable(table, token, "not")
+	} else if TOKEN_OPEN_PARENTESES == token {
+		setTokenInTable(table, token, "open-parenteses")
+	} else if TOKEN_CLOSE_PARENTESES == token {
+		setTokenInTable(table, token, "close-parenteses")
+	} else if TOKEN_OPEN_KEY == token {
+		setTokenInTable(table, token, "open-key")
+	} else if TOKEN_CLOSE_KEY == token {
+		setTokenInTable(table, token, "close-key")
+	} else if TOKEN_ASSIG == token {
+		setTokenInTable(table, token, "assignment")
+	} else if TOKEN_COMMA == token {
+		setTokenInTable(table, token, "comma")
+	} else if TOKEN_COLON == token {
+		setTokenInTable(table, token, "colon")
+	}
 }

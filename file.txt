@@ -2,5 +2,5 @@ if(x+y>3){
     print("ola");
 }
 while(){
-    
+    int variavel123 = 5;
 }
