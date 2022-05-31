@@ -1,5 +1,6 @@
-int x = 10.356;
-int y = 20;
 if(x+y>3){
     print("ola");
+}
+while(){
+    
 }

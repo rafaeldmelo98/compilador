@@ -1,10 +1,16 @@
 package analyses
 
-import "fmt"
-
 func SyntacticAnalysis(table *Table) error {
-	fmt.Println("This is the table", table)
+	tokens := table.Token
+
+	for i := 0; i < len(table.Index); i++ {
+		if tokens[i] == "reserved word" {
+
+		}
+	}
 	return nil
 }
 
-func checkSyntax() {}
+func checkSyntaxIf(tokens []string) bool {
+	return true
+}
